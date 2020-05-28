@@ -1,0 +1,17 @@
+{
+  "devDependencies": {
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11"
+  },
+  "dependencies": {
+    "@mapbox/geojson-merge": "^1.1.1",
+    "@types/node": "^13.11.0"
+  },
+  "scripts": {
+    "test": "echo 'test not implemented'",
+    "develop": "webpack --mode development --watch",
+    "build": "webpack --mode production"
+  }
+}
