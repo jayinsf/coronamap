@@ -71,11 +71,17 @@ export class View {
 
     var dataset : object[] = [];
     for (let i in confirmed['Country/Region']) {
-      dataset.push({
-        'country': confirmed['Country/Region'][i],
-        'confirmed': confirmed[currentTime][i],
-        'death': deaths[currentTime][i]
-      });
+      //fix DataTables warning: table id=datatables - Requested unknown parameter 'confirmed' for row 0, column 1. For more information about this error, please see http://datatables.net/tn/4
+      try {
+        dataset.push({
+          'country': confirmed['Country/Region'][i],
+          'confirmed': confirmed[currentTime][i],
+          'death': deaths[currentTime][i]
+        });
+      } catch (e) {
+        //throw exception if daily disease data are not uploaded yet on Johns Hopkins CSSE repository
+        console.log(e);
+      }
     }
     this.createOneRow(dataset);
   }
