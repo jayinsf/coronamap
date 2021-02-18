@@ -1,16 +1,16 @@
 "use strict";
 
 export class Database {
-  public static readonly DB_NAME : string = 'CoronamapStorage';
-  public static readonly KEY_EXPIRY_TIME : string = 'Expiry Time';
-  public static readonly KEY_CONFIRMED_GEOJSON = 'Confirmed Json';
-  public static readonly KEY_DEATHS_GEOJSON = 'Deaths Json';
-  //stored data expires next day 3am UTC when the automated update is available by CSSEGISandData
-  public static readonly DEFAULT_EXPIRY_TIME : number = new Date().setUTCHours(24 + 3, 0, 0, 0);
-  //use temporary storage if false
-  private static hasLocalStorage : boolean = true;
-  //temporary storage expires after page refresh
-  private static temporaryStorage : Object = {};
+  public static readonly DB_NAME: string = 'CoronamapStorage';
+  public static readonly KEY_EXPIRY_TIME: string = 'Expiry Time';
+  public static readonly KEY_CONFIRMED_GEOJSON: string = 'Confirmed Json';
+  public static readonly KEY_DEATHS_GEOJSON: string = 'Deaths Json';
+  // Stored data expires next day 3am UTC when the automated update is available by public data
+  public static readonly DEFAULT_EXPIRY_TIME: number = new Date().setUTCHours(24 + 3, 0, 0, 0);
+  // Use temporary storage if false
+  private static hasLocalStorage: boolean = true;
+  // Temporary storage expires after page refresh
+  private static temporaryStorage: Object = {};
 
   public constructor() {
     localforage.config({
@@ -19,7 +19,7 @@ export class Database {
     });
   }
 
-  public setItem(key : string, value : any) : void {
+  public setItem(key: string, value: any): void {
     if (Database.hasLocalStorage) {
       localforage.setItem(key, value);
     } else {
@@ -27,7 +27,7 @@ export class Database {
     }
   }
 
-  public async getItem(key : string) : Promise<any> {
+  public async getItem(key: string): Promise<any> {
     if (Database.hasLocalStorage) {
       return localforage.getItem(key).then((value) => {
         if (value) {
@@ -41,7 +41,7 @@ export class Database {
     }
   }
   
-  public clear() : void {
+  public clear(): void {
     if (Database.hasLocalStorage) {
       localforage.clear();
     } else {
@@ -49,11 +49,11 @@ export class Database {
     }
   }
 
-  public supports() : boolean {
+  public supports(): boolean {
     return localforage.supports(localforage.INDEXEDDB);
   }
 
-  public async isExpired() : Promise<any> {
+  public async isExpired(): Promise<any> {
     var extime;
     if (Database.hasLocalStorage) {
       extime = await this.getItem(Database.KEY_EXPIRY_TIME);
@@ -61,21 +61,21 @@ export class Database {
     if (extime) {
       return new Date().getTime() > extime;
     }
-    //expires if database does not contain expiry time
+    // Expire if database does not contain expiry time
     return true;
   }
 
-  public setExpiryTime(extime? : any) : void {
+  public setExpiryTime(extime?: any): void {
     if (Database.hasLocalStorage) {
       this.isExpired().then(function(value) {
         if (value) {
-          localforage.setItem(Database.KEY_EXPIRY_TIME, !extime? Database.DEFAULT_EXPIRY_TIME : extime);
+          localforage.setItem(Database.KEY_EXPIRY_TIME, !extime ? Database.DEFAULT_EXPIRY_TIME : extime);
         }
       });
     }
   }
 
-  public getStorage() : object {
+  public getStorage(): object {
     if (Database.hasLocalStorage) {
       return localforage._dbInfo;
     } else {

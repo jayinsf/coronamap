@@ -3,25 +3,24 @@
 import { TimeDimension } from "./TimeDimension";
 
 export class Map {
-  public static readonly BUTTON_CONTROL_POSITION : string = 'bottomright';
-  public static readonly TIMEDIMENSION_POSITION : string = 'topright';
-  public static readonly SCALE_CONTROL_POSITION : string = 'bottomright';
-  public static readonly LINK_VIEW_SOURCE : string = 'https://github.com/jayinsf/coronamap';
-  private static instance : Map = null;
-  private map : any;
-  private timeDimension : any;
+  public static readonly BUTTON_CONTROL_POSITION: string = 'bottomright';
+  public static readonly TIMEDIMENSION_POSITION: string = 'topright';
+  public static readonly SCALE_CONTROL_POSITION: string = 'bottomright';
+  public static readonly LINK_VIEW_SOURCE: string = 'https://github.com/7ae/coronamap';
+  private static instance: Map = null;
+  private map: any;
+  private timeDimension: any;
 
   private constructor() { }
 
-  public static getInstance() : Map {
+  public static getInstance(): Map {
     if (this.instance === null) {
       this.instance = new Map();
     }
-
     return this.instance;
   }
 
-  public init() : void {
+  public init(): void {
     this.map = L.map('map', {
       zoomControl: true,
       zoomDelta: 0.5,
@@ -37,12 +36,12 @@ export class Map {
       },
     }).setView([30, 0], 2.0);
     
-    //adds scale to map
+    // Add scale to map
     L.control.scale({position: Map.SCALE_CONTROL_POSITION, metric: false}).addTo(this.map);
 
     this.createTimeDimensionControl();
 
-    //loads map tiles
+    // Load map tiles
     var osmLayer = L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
       attribution: 'Disease data &copy; <a href="https://systems.jhu.edu/">Johns Hopkins CSSE</a> Map &copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors, <a href="https://leafletjs.com">Leaflet</a>',
       tileSize: 512,
@@ -52,22 +51,22 @@ export class Map {
     this.createFullscreenControl(Map.BUTTON_CONTROL_POSITION);
   }
 
-  //attaches fullscreen control to zoom buttons
-  private createFullscreenControl(controlPosition : string) : void {
-    //moves zoom buttons
+  // Attach fullscreen control to zoom buttons
+  private createFullscreenControl(controlPosition: string): void {
+    // Move zoom buttons
     this.map.zoomControl.setPosition(controlPosition);
-    //attaches fullscreen control to zoom buttons
+    // Attach fullscreen control to zoom buttons
     L.control.fullscreen({
       position: controlPosition,
       forceSeparateButton: false
     }).addTo(this.map);
   }
 
-  //attaches timedimension control to the map
-  private createTimeDimensionControl() : void {
+  // Attach timedimension control to the map
+  private createTimeDimensionControl(): void {
     L.Control.TimeDimensionCustom = L.Control.TimeDimension.extend({
       //@override
-      _getDisplayDateFormat: function(date : any) {
+      _getDisplayDateFormat: function(date: any) {
         return moment(date).add(1, 'days').format('dddd, LL');
       }
     });
@@ -89,19 +88,19 @@ export class Map {
     this.map.addControl(timeDimensionControl);
   }
 
-  public getMap() : any {
+  public getMap(): any {
     return this.map;
   }
 
-  public attachTimeDimension(td : TimeDimension) : void {
+  public attachTimeDimension(td: TimeDimension): void {
     this.timeDimension = td;
   }
 
-  public dettachTimeDimension() : void {
+  public dettachTimeDimension(): void {
     this.timeDimension = null;
   }
 
-  public getTimeDimension() : TimeDimension {
+  public getTimeDimension(): TimeDimension {
     return this.timeDimension;
   }
 }

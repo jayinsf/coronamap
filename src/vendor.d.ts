@@ -1,17 +1,17 @@
-//jquery
-declare var $ : any;
+// JQuery
+declare var $: any;
 
-//leaflet
-declare var L : any;
+// Leaflet.js
+declare var L: any;
 
-//.json files
+// Files with .json extension
 declare module "*.json" {
-  const value : any;
+  const value: any;
   export default value;
 }
 
-//momentjs
-declare var moment : any;
+// momentjs
+declare var moment: any;
 
-//localforage
-declare var localforage : any;
+// localforage
+declare var localforage: any;

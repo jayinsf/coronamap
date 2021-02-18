@@ -12,13 +12,13 @@ import { CircleMarker } from "./CircleMarker";
 import { View } from "./View";
 moment.suppressDeprecationWarnings = true;
 
-//measures the time it takes to fully load page
+// Measure the time it takes to fully load page
 const t0 = performance.now();
 
 var map = Map.getInstance();
 map.init();
-var worldFr : AbstractReader = new WorldFileReader();
-var usFr : AbstractReader = new StatesFileReader();
+var worldFr: AbstractReader = new WorldFileReader();
+var usFr: AbstractReader = new StatesFileReader();
 var db = new Database();
 db.isExpired().then(function(value) {
   if (value) {
@@ -48,7 +48,7 @@ db.isExpired().then(function(value) {
       map.attachTimeDimension(timedimension);
       timedimension.update();
       
-      //removes spinner when the page is fully loaded
+      // Remove spinner when the page is fully loaded
       document.getElementById('spinner').outerHTML = '';
 
       console.log(`Performance: ${performance.now() - t0} milliseconds.`);

@@ -10,31 +10,31 @@ export enum ChoroplethMode {
 }
 
 export class Choropleth implements ITemporal {
-  public static readonly DEFAULT_SCALE : string[] = ['#fff', '#ffefac', '#fbc750', '#f6b340', '#f09e33', '#e98828', '#e1731e', '#d95b17', '#d14211', '#c81e0d'];
-  public static readonly DEFAULT_BORDER_COLOR : string = '#666';
-  public static readonly DEFAULT_FILL_OPACITY : number = 0.6;
-  public static readonly HIGHLIGHT_FILL_OPACITY : number = 0.65;
-  public static readonly DEFAULT_MODE : ChoroplethMode = ChoroplethMode.Quantile;
-  public static readonly DEFAULT_WEIGHT : number = 1;
-  public static readonly HIGHLIGHT_WEIGHT : number = 1.75;
-  public static readonly LEGEND_CONTROL_POSITION : string = 'bottomleft';
-  public static readonly LEGEND_ELEMENT_CLASS : string = 'choropleth-legend';
-  public static readonly LEGEND_COLOR_WIDTHS : number[] = [1, 1, 1.5, 1.5, 1.5, 2, 2.5, 3, 5];
-  private scale : string[];
-  private borderColor : string;
-  private fillOpacity : number;
-  private mode : ChoroplethMode;
+  public static readonly DEFAULT_SCALE: string[] = ['#fff', '#ffefac', '#fbc750', '#f6b340', '#f09e33', '#e98828', '#e1731e', '#d95b17', '#d14211', '#c81e0d'];
+  public static readonly DEFAULT_BORDER_COLOR: string = '#666';
+  public static readonly DEFAULT_FILL_OPACITY: number = 0.6;
+  public static readonly HIGHLIGHT_FILL_OPACITY: number = 0.65;
+  public static readonly DEFAULT_MODE: ChoroplethMode = ChoroplethMode.Quantile;
+  public static readonly DEFAULT_WEIGHT: number = 1;
+  public static readonly HIGHLIGHT_WEIGHT: number = 1.75;
+  public static readonly LEGEND_CONTROL_POSITION: string = 'bottomleft';
+  public static readonly LEGEND_ELEMENT_CLASS: string = 'choropleth-legend';
+  public static readonly LEGEND_COLOR_WIDTHS: number[] = [1, 1, 1.5, 1.5, 1.5, 2, 2.5, 3, 5];
+  private scale: string[];
+  private borderColor: string;
+  private fillOpacity: number;
+  private mode: ChoroplethMode;
 
-  public constructor(scale? : string[], borderColor? : string, fillOpacity? : number, mode? : ChoroplethMode) {
+  public constructor(scale?: string[], borderColor?: string, fillOpacity?: number, mode?: ChoroplethMode) {
     this.scale = !scale || scale.length < 1 ? Choropleth.DEFAULT_SCALE : scale;
     this.borderColor = !borderColor ? Choropleth.DEFAULT_BORDER_COLOR : borderColor;
     this.fillOpacity = !fillOpacity ? Choropleth.DEFAULT_FILL_OPACITY : fillOpacity;
     this.mode = !mode ? Choropleth.DEFAULT_MODE : mode;
   }
 
-  public update(geoJson : object) : any {
+  public update(geoJson: object): any {
     var choroplethLayer = L.choropleth(geoJson, {
-      //which property in the features to use
+      // Set properties to use
       valueProperty: Map.getInstance().getTimeDimension().getCurrentTime(),
       scale: this.scale,
       mode: this.mode,
@@ -52,11 +52,11 @@ export class Choropleth implements ITemporal {
     return choroplethLayer;
   }
 
-  public createLegend(choroplethLayer : any) : void {
-    //adapted from Tim Wisniewski's example: https://github.com/timwis/leaflet-choropleth/blob/gh-pages/examples/legend/demo.js retrieved in March 2020.
+  public createLegend(choroplethLayer: any): void {
+    // Adapted from Tim Wisniewski's example: https://github.com/timwis/leaflet-choropleth/blob/gh-pages/examples/legend/demo.js retrieved in March 2020.
     var legend = L.control({ position: Choropleth.LEGEND_CONTROL_POSITION });
     legend.onAdd = function() {
-      var div : Element;
+      var div: Element;
       if ($('div.' + Choropleth.LEGEND_ELEMENT_CLASS).length > 0) {
         div = document.querySelectorAll('div.' + Choropleth.LEGEND_ELEMENT_CLASS)[0];
       } else {
@@ -73,9 +73,9 @@ export class Choropleth implements ITemporal {
       
       var labels = [];
 
-      //adds min and max labels
+      // Add min and max labels
       div.innerHTML = '<div class="min"><span>Cases:</span> ' + limits[0] + '</div><div class="max">' + limits[limits.length - 1] + '</div></div>';
-      //style
+      // Style
       limits.forEach(function (limit, index) {
         labels.push('<li style="background-color:' + colors[index]
           + ';width:' + Choropleth.LEGEND_COLOR_WIDTHS[index] + 'vw;"></li>');
@@ -87,39 +87,39 @@ export class Choropleth implements ITemporal {
     legend.addTo(Map.getInstance().getMap());
   }
 
-  public setScale(scale : string[]) : void {
+  public setScale(scale: string[]): void {
     this.scale = scale;
   }
 
-  public getScale() : string[] {
+  public getScale(): string[] {
     return this.scale;
   }
   
-  public setBorderColor(borderColor : string) : void {
+  public setBorderColor(borderColor: string): void {
     this.borderColor = borderColor;
   }
 
-  public getBorderColor() : string {
+  public getBorderColor(): string {
     return this.borderColor;
   }
   
-  public setFillOpacity(fillOpacity : number) : void {
+  public setFillOpacity(fillOpacity: number): void {
     this.fillOpacity = fillOpacity;
   }
 
-  public getFillOpacity() : number {
+  public getFillOpacity(): number {
     return this.fillOpacity;
   }
   
-  public setMode(mode : ChoroplethMode) : void {
+  public setMode(mode: ChoroplethMode): void {
     this.mode = mode;
   }
 
-  public getMode() : ChoroplethMode {
+  public getMode(): ChoroplethMode {
     return this.mode;
   }
 
-  private static pushAverageOfEveryElement(array : number[]) : number[] {
+  private static pushAverageOfEveryElement(array: number[]): number[] {
     var newArray = [];
     for (let element in array) {
         var index = parseInt(element);
@@ -131,7 +131,7 @@ export class Choropleth implements ITemporal {
   }
 }
 
-//adapted from Leaflet's example: https://leafletjs.com/examples/choropleth retrieved in March 2020.
+// Adapted from Leaflet's example: https://leafletjs.com/examples/choropleth retrieved in March 2020.
 export function onEachFeature(_, layer) {
   layer.on({
     mouseover: highlightFeature,
@@ -141,7 +141,7 @@ export function onEachFeature(_, layer) {
 }
 
 function resetHighlight(e) {
-  //iterate each map layer and run resetStyle() function
+  // Iterate each map layer and run resetStyle() function
   $.each(Map.getInstance().getTimeDimension().getLayers(), function(index, value) {
     try {
       var layer = e.target;

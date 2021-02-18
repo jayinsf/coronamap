@@ -4,20 +4,20 @@ import { AbstractReader } from "./AbstractReader";
 import * as usStatesGeoJSONFile from '../dist/src/us-states.json';
 
 export class StatesFileReader extends AbstractReader {
-  public static readonly CONFIRMED_FILE_SCOPE = 'time_series_covid19_confirmed_US.csv';
-  public static readonly DEATHS_FILE_SCOPE = 'time_series_covid19_deaths_US.csv';
-  public static readonly CENTER_OF_LAT_KEY = "Lat";
-  public static readonly CENTER_OF_LONG_KEY = "Long";
+  public static readonly CONFIRMED_FILE_SCOPE: string = 'time_series_covid19_confirmed_US.csv';
+  public static readonly DEATHS_FILE_SCOPE: string = 'time_series_covid19_deaths_US.csv';
+  public static readonly CENTER_OF_LAT_KEY: string = "Lat";
+  public static readonly CENTER_OF_LONG_KEY: string = "Long";
 
   public constructor() {
     super();
   }
 
-  public init() : void {
+  public init(): void {
     var centerOfLatLong = this.readCsv("https://raw.githubusercontent.com/jayinsf/coronamap/master/dist/src/states.csv");
     
-    var confirmed : any = this.readCsv(AbstractReader.BASE_URL + StatesFileReader.CONFIRMED_FILE_SCOPE);
-    var deaths : any = this.readCsv(AbstractReader.BASE_URL + StatesFileReader.DEATHS_FILE_SCOPE);
+    var confirmed: any = this.readCsv(AbstractReader.BASE_URL + StatesFileReader.CONFIRMED_FILE_SCOPE);
+    var deaths: any = this.readCsv(AbstractReader.BASE_URL + StatesFileReader.DEATHS_FILE_SCOPE);
     
     confirmed = this.replaceColumnKeys(confirmed);
     deaths = this.replaceColumnKeys(deaths);
@@ -35,12 +35,12 @@ export class StatesFileReader extends AbstractReader {
     this.setDeathsGeoJson(this.addCenterOfCordinates(this.csvToObject(centerOfLatLong), this.getDeathsGeoJson()));
   }
   
-  //loads geojson file and returns copy of geojson object
-  public loadGeoJsonFile() : object {
+  // Load geojson file and return copy of geojson object
+  public loadGeoJsonFile(): object {
     return JSON.parse(JSON.stringify(usStatesGeoJSONFile.default));
   }
 
-  public replaceColumnKeys(csv : any) : string {
+  public replaceColumnKeys(csv: any): string {
     const dict = {
       "Province_State": "Province/State",
       "Country_Region": "Country/Region",
@@ -49,16 +49,16 @@ export class StatesFileReader extends AbstractReader {
     return super.replaceColumnKeys(csv, dict);
   }
 
-  public replaceColumnValues(csv : any) : object {
+  public replaceColumnValues(csv: any): object {
     const dict = {}
     return super.replaceColumnValues(csv, dict, 'Province/State');
   }
 
-  public setPropertyValues(csv : any, geoJson : object) : object {
+  public setPropertyValues(csv: any, geoJson: object): object {
     return super.setPropertyValues(csv, geoJson, 'Province/State', 'name');
   }
 
-  public addCenterOfCordinates(csv : any, geoJson : any) : object {
+  public addCenterOfCordinates(csv: any, geoJson: any): object {
     for (let feature of geoJson.features) {
       for (let csvRow of csv) {
         if (feature.id == csvRow.state) {

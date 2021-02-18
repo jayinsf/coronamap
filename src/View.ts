@@ -4,13 +4,13 @@ import { Map } from "./Map";
 import { AbstractReader } from "./AbstractReader";
 
 export class View {
-  private table : any;
-  private confirmedWorldFeatures : any;
-  private deathsWorldFeatures : any;
-  private confirmedUSFeatures : any;
-  private deathsUSFeatures : any;
+  private table: any;
+  private confirmedWorldFeatures: any;
+  private deathsWorldFeatures: any;
+  private confirmedUSFeatures: any;
+  private deathsUSFeatures: any;
 
-  constructor(confirmedGeoJson : any, deathsGeoJson : any) {
+  constructor(confirmedGeoJson: any, deathsGeoJson: any) {
     document.getElementById('table').style.visibility = 'visible';
 
     this.confirmedWorldFeatures = confirmedGeoJson.features.slice(0, -50);
@@ -20,7 +20,7 @@ export class View {
     this.deathsUSFeatures = deathsGeoJson.features.slice(1).slice(-50);
   }
   
-  public init() : void {
+  public init(): void {
     this.table = $('#datatables').DataTable({
       autoWidth: false,
       columnDefs: [{
@@ -45,7 +45,7 @@ export class View {
     });
   }
   
-  public update() : object {
+  public update(): object {
     this.table.clear().draw();
     //extracts all except states at the end of geojson
     this.createRows(this.confirmedWorldFeatures, this.deathsWorldFeatures);
@@ -53,7 +53,7 @@ export class View {
     return L.layerGroup().addTo(Map.getInstance().getMap());
   }
 
-  public createRows(confirmedFeatures : object, deathsFeatures : object, isStates : boolean = false) : any {
+  public createRows(confirmedFeatures: object, deathsFeatures: object, isStates: boolean = false): any {
     var currentTime = Map.getInstance().getTimeDimension().getCurrentTime();
     var confirmed = AbstractReader.getProperty(confirmedFeatures, ['Country/Region', currentTime]);
     var deaths = AbstractReader.getProperty(deathsFeatures, [currentTime]);
@@ -61,36 +61,36 @@ export class View {
     if (isStates) {
       this.createOneRow([
         {
-        'country': confirmed['Country/Region'][0],
-        'confirmed': this.sumArrayItems(confirmed[currentTime]),
-        'death': this.sumArrayItems(deaths[currentTime])
+          'country': confirmed['Country/Region'][0],
+          'confirmed': this.sumArrayItems(confirmed[currentTime]).toLocaleString(),
+          'death': this.sumArrayItems(deaths[currentTime]).toLocaleString(),
         }
       ]);
       return;
     }
 
-    var dataset : object[] = [];
+    var dataset: object[] = [];
     for (let i in confirmed['Country/Region']) {
-      //fix DataTables warning: table id=datatables - Requested unknown parameter 'confirmed' for row 0, column 1. For more information about this error, please see http://datatables.net/tn/4
+      // Fix DataTables warning: table id=datatables - Requested unknown parameter 'confirmed' for row 0, column 1. For more information about this error, please see http://datatables.net/tn/4
       try {
         dataset.push({
           'country': confirmed['Country/Region'][i],
-          'confirmed': confirmed[currentTime][i],
-          'death': deaths[currentTime][i]
+          'confirmed': confirmed[currentTime][i].toLocaleString(),
+          'death': deaths[currentTime][i].toLocaleString()
         });
       } catch (e) {
-        //throw exception if daily disease data are not uploaded yet on Johns Hopkins CSSE repository
+        // Throw exception if today's disease data is not found on public
         console.log(e);
       }
     }
     this.createOneRow(dataset);
   }
 
-  private createOneRow(dataset : object[]) : void { 
+  private createOneRow(dataset: object[]): void { 
     this.table.rows.add(dataset).draw();
   }
 
-  private sumArrayItems(arr : number[]) : number {
+  private sumArrayItems(arr: number[]): number {
     var sum = 0;
     for (let i in arr) {
       sum += arr[i];

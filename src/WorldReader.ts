@@ -12,10 +12,10 @@ export class WorldFileReader extends AbstractReader {
     super();
   }
 
-  public init() : void {
-    var confirmed : any = this.readCsv(AbstractReader.BASE_URL + WorldFileReader.CONFIRMED_FILE_SCOPE);
-    var deaths : any = this.readCsv(AbstractReader.BASE_URL + WorldFileReader.DEATHS_FILE_SCOPE);
-    var recovered : any = this.readCsv(AbstractReader.BASE_URL + WorldFileReader.RECOVERED_FILE_SCOPE);
+  public init(): void {
+    var confirmed: any = this.readCsv(AbstractReader.BASE_URL + WorldFileReader.CONFIRMED_FILE_SCOPE);
+    var deaths: any = this.readCsv(AbstractReader.BASE_URL + WorldFileReader.DEATHS_FILE_SCOPE);
+    var recovered: any = this.readCsv(AbstractReader.BASE_URL + WorldFileReader.RECOVERED_FILE_SCOPE);
     
     confirmed = this.replaceText(confirmed, 'Greenland,Denmark', 'Greenland,Greenland');
     deaths = this.replaceText(deaths, 'Greenland,Denmark', 'Greenland,Greenland');
@@ -36,11 +36,11 @@ export class WorldFileReader extends AbstractReader {
     super.setRecoveredGeoJson(this.setPropertyValues(recovered, this.loadGeoJsonFile()));
   }
 
-  public loadGeoJsonFile() : object {
+  public loadGeoJsonFile(): object {
     return JSON.parse(JSON.stringify(worldCountriesGeoJSONFile.default));
   }
 
-  public replaceColumnValues(csv : any) : object {
+  public replaceColumnValues(csv: any): object {
     const dict = {
       "Burma": "Myanmar",
       "Czechia": "Czech Republic",
@@ -55,8 +55,8 @@ export class WorldFileReader extends AbstractReader {
     return super.replaceColumnValues(csv, dict, 'Country/Region');
   }
 
-  //appends csv data to geojson
-  public setPropertyValues(csv : any, geoJson : object) : object {
+  // Append csv data to geojson
+  public setPropertyValues(csv: any, geoJson: object): object {
     return super.setPropertyValues(csv, geoJson, 'Country/Region', 'name');
   }
 }

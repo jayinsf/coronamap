@@ -4,21 +4,19 @@ import { TimeDimension } from "./TimeDimension";
 var geojsonMerge = require('@mapbox/geojson-merge');
 
 export abstract class AbstractReader {
-  public static readonly BASE_URL = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/";
-  private confirmedGeoJson : object;
-  private deathsGeoJson : object;
-  private recoveredGeoJson : object;
+  public static readonly BASE_URL: string = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/";
+  private confirmedGeoJson: object;
+  private deathsGeoJson: object;
+  private recoveredGeoJson: object;
 
-  public constructor() {
-    
-  }
+  public constructor() { }
 
-  public abstract init() : void;
+  public abstract init(): void;
 
-  public abstract loadGeoJsonFile() : object;
+  public abstract loadGeoJsonFile(): object;
 
-  //retrieves csv data from preset url
-  public readCsv(scope : string) : string {
+  // Retrieve csv data from url
+  public readCsv(scope: string): string {
     var response;
     $.ajax({
       url: scope,
@@ -31,11 +29,11 @@ export abstract class AbstractReader {
     return response;
   };
 
-  public csvToObject(csv : string) : object {
+  public csvToObject(csv: string): object {
     return $.csv.toObjects(csv);
   }
 
-  public replaceColumnKeys(csv : any, dict : object) : string {
+  public replaceColumnKeys(csv: any, dict: object): string {
     var header = csv.split("\n")[0];
     for (let key of Object.keys(dict)) {
       header = header.replace(key, dict[key]);
@@ -43,9 +41,8 @@ export abstract class AbstractReader {
     return header + '\r\n' + csv.split("\n").slice(1).join("\n");
   }
 
-  //finds and equalize different region names between geojson and csv data
-  //find those data geojson has, but csv doesn't
-  public replaceColumnValues(csv : any, dict : object, colName : string) : object {
+  // Find different data between geojson and csv, and equalize different region names between geojson and csv data
+  public replaceColumnValues(csv: any, dict: object, colName: string): object {
     var regex = new RegExp('^' + Object.keys(dict).map(_ => _.replace(/[+?^*${}()|[\]\\]/ig, '\\$&')).join('$|^') + '$', 'gi');
     
     $(csv).each(function(index, value) {
@@ -55,19 +52,18 @@ export abstract class AbstractReader {
     return csv;
   }
 
-  //reuturn property values in csv, not in geojsome
-  //return empty object if there is no different values between csv and geojson
-  public comparePropertyValues(csv : any, geoJson: object, colName : string, propertyKey : string): object {
+  // Return property values in csv, not in geojson, or empty object if there is no different values between geojson and csv
+  public comparePropertyValues(csv: any, geoJson: object, colName: string, propertyKey: string): object {
     return $(csv.map(_ => _[colName])).not(geoJson).get().filter(function(v, i, _) { return _.indexOf(v) >= i; });
   }
 
-  public setPropertyValues(csv : any, geoJson : any, colName : string, geoJsonKey : string) : object {
+  public setPropertyValues(csv: any, geoJson: any, colName: string, geoJsonKey: string): object {
     for (let value of geoJson.features) {
       var id = 0;
       for (let csvIdx in csv) {
-        //if geojson properties name value matches to csv column value
+        // If geojson properties name value matches to csv column value
         if (value.properties[geoJsonKey] == csv[csvIdx][colName]) {
-          //set properties in geojson with new values
+          // Set properties in geojson with new values
           value.properties[id] = csv[csvIdx];
           id++;
         }
@@ -77,7 +73,7 @@ export abstract class AbstractReader {
     return geoJson;
   }
 
-  public static getProperty(features : any, propertyNames : string[]) : any[] {
+  public static getProperty(features: any, propertyNames: string[]): any[] {
     var values = [];
     for (let i in Object.values(features)) {
       if (features[i].properties['Country/Region']) {
@@ -92,7 +88,7 @@ export abstract class AbstractReader {
     return values;
   }
 
-  public static mergeGeoJsons(geoJson : object, otherGeoJson : object) : object {
+  public static mergeGeoJsons(geoJson: object, otherGeoJson: object): object {
     var mergedGeoJson = geojsonMerge.merge([
       geoJson,
       otherGeoJson
@@ -100,35 +96,35 @@ export abstract class AbstractReader {
     return mergedGeoJson;
   }
 
-  public setConfirmedGeoJson(geoJson : object) : void {
+  public setConfirmedGeoJson(geoJson: object): void {
     this.confirmedGeoJson = geoJson;
   }
 
-  public getConfirmedGeoJson() : object {
+  public getConfirmedGeoJson(): object {
     return this.confirmedGeoJson;
   }
 
-  public setDeathsGeoJson(geoJson : object) : void {
+  public setDeathsGeoJson(geoJson: object): void {
     this.deathsGeoJson = geoJson;
   }
 
-  public getDeathsGeoJson() : object {
+  public getDeathsGeoJson(): object {
     return this.deathsGeoJson;
   }
 
-  public setRecoveredGeoJson(geoJson : object) : void {
+  public setRecoveredGeoJson(geoJson: object): void {
     this.recoveredGeoJson = geoJson;
   }
 
-  public getRecoveredGeoJson() : object {
+  public getRecoveredGeoJson(): object {
     return this.recoveredGeoJson;
   }
 
-  public replaceText(text : string, from : string, to : string, repeat : boolean = false) : string {
-    return text.replace(repeat? '\/' + from + '\/g' : from, to); 
+  public replaceText(text: string, from: string, to: string, repeat: boolean = false): string {
+    return text.replace(repeat ? '\/' + from + '\/g' : from, to); 
   }
 
-  public getNumberOfCase(features : any, time : string, latlong : [number, number]) : number {
+  public getNumberOfCase(features: any, time: string, latlong: [number, number]): number {
     for (let featIdx = 0, len = Object.keys(features).length; featIdx < len; featIdx++) {
       var prop = features[featIdx]['properties'];
 
@@ -147,19 +143,19 @@ export abstract class AbstractReader {
     return;
   }
 
-  public subtractRecoveredFromConfirmed(confirmedGeoJson : any, recoveredGeoJson : any) : object {
+  public subtractRecoveredFromConfirmed(confirmedGeoJson: any, recoveredGeoJson: any): object {
     var clonedConfirmedGeoJson = confirmedGeoJson;
-    //iterates each country in confirmed geojson
+    // Iterate each country in confirmed geojson
     for (let confirmedCountry of Object.values(clonedConfirmedGeoJson)) {
-      //iterates each country in recovered geojson
+      // Iterate each country in recovered geojson
       for (let recoveredCountry of Object.values(recoveredGeoJson)) {
-        //for each key from each country
+        // For each key from each country
         for (let key of Object.keys(confirmedCountry)) {
-          //find the exact same country and state names in two geojsons
+          // Find the exact same country and state names in two geojsons
           if (confirmedCountry['Province/State'] === recoveredCountry['Province/State'] && confirmedCountry['Country/Region'] === recoveredCountry['Country/Region']) {
-            //if key is date
+            // If key is date
             if (moment(key).isValid()) {
-              //subtract number of recovered cases from number of confirmed cases on the date
+              // Subtract number of recovered cases from number of confirmed cases on the date
               confirmedCountry[key] -= recoveredCountry[key];
             }
           }
@@ -169,21 +165,21 @@ export abstract class AbstractReader {
     return clonedConfirmedGeoJson;
   }
 
-  private pushTotalNumberOfCaseToProperties(geoJson : any) : void {
-    //iterates geojson
+  private pushTotalNumberOfCaseToProperties(geoJson: any): void {
+    // Iterate geojson
     for (let featIdx = 0, len = Object.keys(geoJson.features).length; featIdx < len; featIdx++) {
       var totalCaseByDate = {};
-      //iterates properties
+      // Iterate properties
       for (let keyIdx = 0, len = Object.keys(geoJson.features[featIdx].properties).length; keyIdx < len; keyIdx++) {
         var key = Object.keys(geoJson.features[featIdx].properties)[keyIdx];
-        //cities and counties are object
+        // Cities and counties are object
         if(geoJson.features[featIdx].properties[key] && typeof geoJson.features[featIdx].properties[key] === 'object') {
-          //iterates keys in each object
+          // Iterate keys in each object
           for (let objectKey of Object.keys(geoJson.features[featIdx].properties[key])) {
-            //if key is date
+            // If key is date
             if (moment(objectKey).isValid()) {
               var date = moment(objectKey).format(TimeDimension.DATE_FORMAT);
-              //stack number of cases in this city or county
+              // Stack number of cases in this city or county
               if (!totalCaseByDate[date]) {
                 totalCaseByDate[date] = parseInt(geoJson.features[featIdx].properties[key][objectKey]);
               } else if (totalCaseByDate[date] > 0) {
@@ -195,7 +191,7 @@ export abstract class AbstractReader {
           }
         }
       }
-      //add total number of cases in scope of properties
+      // Add total number of cases in scope of properties
       for (let country in totalCaseByDate) {
         geoJson.features[featIdx].properties[country] = totalCaseByDate[country];
       }
